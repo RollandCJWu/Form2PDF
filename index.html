@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>語言治療計畫表單</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            font-size: 13px;
+        }
+
+        form {
+            max-width: 790px;
+            margin: auto;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        #upload-PDF, #upload-PDF-name {
+            display: inline-block;
+            font-size: 16px;
+        }
+
+        input[type=text],
+        input[type=number],
+        input[type=date],
+        select {
+            width: 100%;
+            padding: 6px 10px;
+            margin: 4px 2px;
+            font-size: 14px;
+            box-sizing: border-box;
+            border: none;
+            border-bottom: 2px solid black;
+        }
+
+        select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background: none;
+        }
+        input[type=date]::-webkit-calendar-picker-indicator {
+            display: none;
+        }
+
+        /* form group */
+        .form-group {
+            display: flex;
+            align-items: center;
+        }
+        .form-group label {
+            margin-right: 10px;
+            white-space: nowrap;
+        }
+        .form-group .s1 {
+            padding-left: 5pt;
+            text-indent: 0pt;
+            text-align: left;
+        }
+        /* form group */
+
+        table .s2 {
+            padding-left: 14pt;
+            text-indent: 0pt;
+            line-height: 16pt;
+            text-align: left;
+        }
+
+        #symptom {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0;
+        }
+        .symptoms td {
+            width: 53pt;
+            border-top-style: solid;
+            border-top-width: 1pt;
+            border-left-style: solid;
+            border-left-width: 1pt;
+            border-bottom-style: solid;
+            border-bottom-width: 1pt;
+            border-right-style: solid;
+            border-right-width: 1pt;
+            padding: 10;
+            margin: 10;
+        }
+
+        .class-record td {
+            border-top-style:solid;
+            border-top-width:1pt;
+            border-left-style:solid;
+            border-left-width:1pt;
+            border-bottom-style:solid;
+            border-bottom-width:1pt;
+            border-right-style:solid;
+            border-right-width:1pt;
+
+            label {
+                font-size: 14px;
+            }  
+        }
+
+        /* checkbox */
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .checkbox-group input[type=checkbox] {
+            width: 18px;
+            height: 18px;
+        }
+        .checkbox-group label {
+            margin-left: 5px;
+            white-space: nowrap;
+        }
+        /* checkbox */
+
+        button {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+    <a href="login.html">如需存取資料，請先登入</a>
+
+    <form id="therapy-form">
+        <h2>【語言治療計畫】</h2>
+
+        <table id="basic-info" style="border-collapse:collapse;margin-left:6.16998pt" cellspacing="0">
+            <tr style="height:20pt">
+                <td
+                    style="width:111pt;border-top-style:solid;border-top-width:1pt;border-left-style:solid;border-left-width:1pt">
+                    <div class="form-group">
+                        <label class="s1"><span>姓名：</span></label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                </td>
+                <td style="width:83pt;border-top-style:solid;border-top-width:1pt">
+                    <div class="form-group">
+                        <label class="s1"><span>性別：</span></label>
+                        <select name="gender" id="gender" required>
+                            <option disabled selected value></option>
+                            <option value="男">男</option>
+                            <option value="女">女</option>
+                            <option value="其他">其他</option>
+                        </select>
+                    </div>
+                </td>
+                <td style="width:189pt;border-top-style:solid;border-top-width:1pt">
+                    <div class="form-group">
+                        <label class="s1"><span>實足年齡：</span></label>
+                        <input type="number" id="year" name="year" min="0" required>
+                        <label class="s1"><span>歲</span></label>
+                        <input type="number" id="month" name="month" max="11" min="1" required>
+                        <label class="s1"><span>月</span></label>
+                    </div>
+                </td>
+                <td
+                    style="width:152pt;border-top-style:solid;border-top-width:1pt;border-right-style:solid;border-right-width:1pt">
+                    <div class="form-group">
+                        <label class="s1"><span>病歷號：</span></label>
+                        <input type="text" id="medicalId" name="medicalId" required>
+                    </div>
+                </td>
+            </tr>
+            <tr style="height:28pt">
+                <td colspan="2"
+                    style="border-left-style:solid;border-left-width:1pt;border-bottom-style:solid;border-bottom-width:1pt">
+                    <div class="form-group
+                        "><label class="s1"><span>醫療診斷：</span></label><input type="text" id="diagnosis"
+                            name="diagnosis" required>
+                    </div>
+                </td>
+                <td style="border-bottom-style:solid;border-bottom-width:1pt">
+                    <div class="form-group
+                        "><label class="s1"><span>語言障礙：</span></label><input type="text" id="langBarrier"
+                            name="langBarrier" required>
+                    </div>
+                </td>
+                <td
+                    style="border-bottom-style:solid;border-bottom-width:1pt;border-right-style:solid;border-right-width:1pt">
+                    <div class="form-group
+                        "><label class="s1"><span>治療師：</span></label><input type="text" id="therapist" name="therapist"
+                            required>
+                    </div>
+                </td>
+            </tr>
+            <tr style="height:47pt">
+                <td colspan="5"
+                    style="border-top-style:solid;border-top-width:1pt;border-left-style:solid;border-left-width:1pt;border-right-style:solid;border-right-width:1pt;">
+                    <div class="checkbox-group">
+                        <label class="s1">語言目標：</label>
+                        <label><input type="checkbox" name="langGoal" value="語言">語言</label>
+                        <label><input type="checkbox" name="langGoal" value="言語">言語</label>
+                        <label><input type="checkbox" name="langGoal" value="吞嚥">吞嚥</label>
+                        <label><input type="checkbox" name="langGoal" value="溝通輔具">溝通輔具</label>
+
+                        <label class="s1">&emsp;&emsp;&emsp;計畫擬定：</label>
+                        <label><input type="checkbox" name="plan" value="3個月">3個月</label>
+                        <label><input type="checkbox" name="plan" value="6個月內提升">6個月內提升</label>
+                    </div>
+
+                    <table id="symptom">
+                        <tr class="symptoms">
+                            <td>
+                                <label class="s2">溝通</label>
+                            </td>
+                            <td>
+                                <label class="s2">理解</label>
+                            </td>
+                            <td>
+                                <label class="s2">表達</label>
+                            </td>
+                            <td>
+                                <label class="s2">閱讀</label>
+                            </td>
+                            <td>
+                                <label class="s2">書寫</label>
+                            </td>
+                            <td>
+                                <label class="s2">語用</label>
+                            </td>
+                            <td>
+                                <label class="s2">言語</label>
+                            </td>
+                            <td>
+                                <label class="s2">吞嚥</label>
+                            </td>
+                            <td>
+                                <label class="s2">輔助溝通</label>
+                            </td>
+                        </tr>
+                        <tr class="symptoms">
+                            <td>
+                                <div class="checkbox-group">
+                                    <label><input type="checkbox" name="communication" value="共同注意">共同注意</label>
+                                    <label><input type="checkbox" name="communication" value="回應指令">回應指令</label>
+                                    <label><input type="checkbox" name="communication" value="互動模仿">互動模仿</label>
+                                    <label><input type="checkbox" name="communication" value="互動輪替">互動輪替</label>
+                                    <label><input type="checkbox" name="communication" value="其他">其他：</label>
+                                    <input type="text" id="communication" name="communication_other">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="checkbox-group">
+                                    <label><input type="checkbox" name="understanding" value="生活指令">生活指令</label>
+                                    <label><input type="checkbox" name="understanding" value="詞彙階段">詞彙階段</label>
+                                    <label><input type="checkbox" name="understanding" value="語法階段">語法階段</label>
+                                    <label><input type="checkbox" name="understanding" value="推理階段">推理階段</label>
+                                    <label><input type="checkbox" name="understanding" value="定義階段">定義階段</label>
+                                    <label><input type="checkbox" name="understanding" value="後設階段">後設階段</label>
+                                    <label><input type="checkbox" name="understanding" value="其他">其他：</label>
+                                    <input type="text" id="understanding" name="understanding_other">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="checkbox-group">
+                                    <label><input type="checkbox" name="expression" value="非語言">非語言</label>
+                                    <label><input type="checkbox" name="expression" value="發聲">發聲</label>
+                                    <label><input type="checkbox" name="expression" value="仿說">仿說</label>
+                                    <label><input type="checkbox" name="expression" value="簡單句">簡單句</label>
+                                    <label><input type="checkbox" name="expression" value="複雜語句">複雜語句</label>
+                                    <label><input type="checkbox" name="expression" value="敘事故事">敘事故事</label>
+                                    <label><input type="checkbox" name="expression" value="其他">其他：</label>
+                                    <input type="text" id="expression" name="expression_other">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="checkbox-group">
+                                    <label><input type="checkbox" name="reading" value="符號覺察">符號覺察</label>
+                                    <label><input type="checkbox" name="reading" value="符號辨識">符號辨識</label>
+                                    <label><input type="checkbox" name="reading" value="顏色數字">顏色數字</label>
+                                    <label><input type="checkbox" name="reading" value="注音階段">注音階段</label>
+                                    <label><input type="checkbox" name="reading" value="文字階段">文字階段</label>
+                                    <label><input type="checkbox" name="reading" value="流暢閱讀">流暢閱讀</label>
+                                    <label><input type="checkbox" name="reading" value="其他">其他：</label>
+                                    <input type="text" id="reading" name="reading_other">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="checkbox-group">
+                                    <label><input type="checkbox" name="writing" value="塗鴉興趣">塗鴉興趣</label>
+                                    <label><input type="checkbox" name="writing" value="圖畫象徵">圖畫象徵</label>
+                                    <label><input type="checkbox" name="writing" value="描寫階段">描寫階段</label>
+                                    <label><input type="checkbox" name="writing" value="仿寫階段">仿寫階段</label>
+                                    <label><input type="checkbox" name="writing" value="自發書寫字詞-句-文">自發書寫<br>字詞-句-文</label>
+                                    <label><input type="checkbox" name="writing" value="其他">其他：</label>
+                                    <input type="text" id="writing" name="writing_other">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="checkbox-group">
+                                    <label><input type="checkbox" name="pragmatics" value="開啟話題">開啟話題</label>
+                                    <label><input type="checkbox" name="pragmatics" value="維持話題">維持話題</label>
+                                    <label><input type="checkbox" name="pragmatics" value="修補話題">修補話題</label>
+                                    <label><input type="checkbox" name="pragmatics" value="評論延續">評論延續</label>
+                                    <label><input type="checkbox" name="pragmatics" value="適當轉換">適當轉換</label>
+                                    <label><input type="checkbox" name="pragmatics" value="結尾話題">結尾話題</label>
+                                    <label><input type="checkbox" name="pragmatics" value="其他">其他：</label>
+                                    <input type="text" id="pragmatics" name="pragmatics_other">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="checkbox-group">
+                                    <label><input type="checkbox" name="lang_speak" value="動作計畫">動作計畫</label>
+                                    <label><input type="checkbox" name="lang_speak" value="構音訓練">構音訓練</label>
+                                    <label><input type="checkbox" name="lang_speak" value="音韻歷程">音韻歷程</label>
+                                    <label><input type="checkbox" name="lang_speak" value="共鳴訓練">共鳴訓練</label>
+                                    <label><input type="checkbox" name="lang_speak" value="嗓音訓練">嗓音訓練</label>
+                                    <label><input type="checkbox" name="lang_speak" value="語暢訓練">語暢訓練</label>
+                                    <label><input type="checkbox" name="lang_speak" value="其他">其他：</label>
+                                    <input type="text" id="lang_speak" name="lang_speak_other">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="checkbox-group">
+                                    <label><input type="checkbox" name="swallowing" value="口腔感覺">口腔感覺</label>
+                                    <label><input type="checkbox" name="swallowing" value="口腔動作">口腔動作</label>
+                                    <label><input type="checkbox" name="swallowing" value="口腔按摩">口腔按摩</label>
+                                    <label><input type="checkbox" name="swallowing" value="吞嚥反射">吞嚥反射</label>
+                                    <label><input type="checkbox" name="swallowing" value="吞嚥功能">吞嚥功能</label>
+                                    <label><input type="checkbox" name="swallowing" value="其他">其他：</label>
+                                    <input type="text" id="swallowing" name="swallowing_other">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="checkbox-group">
+                                    <label><input type="checkbox" name="aac" value="聽能創建">聽能創建</label>
+                                    <label><input type="checkbox" name="aac" value="AAC">AAC</label>
+                                    <label><input type="checkbox" name="aac" value="其他">其他：</label>
+                                    <input type="text" id="aac" name="aac_other">
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+
+        <h2>每日課節紀錄</h2>
+        <table class="class-record" style="border-collapse:collapse; width:97.3%; margin-left:6.16998pt" cellspacing="0">
+            <tr>
+                <td
+                style="width:71pt;">
+                    <div class="form-group">
+                        <label class="s1">治療日期：</label>
+                        <input type="date" class="therapy-date" name="therapy-date" required>
+                    </div>
+                    <div class="form-group" style="width: 120pt;">
+                        <label class="s1"><span>第</span></label>
+                        <input type="number" class="therapy-times" name="therapy-times" min="1" required>
+                        <label class="s1"><span>次治療</span></label>
+                    </div>
+                </td>
+                <td>
+                    <textarea style="width: 99%; height: 110px;" placeholder="依據勾選的短期語言目標 (描述課節目標的細節內容) 精進目標撰寫參考 (ABCD、SMART goal)"></textarea>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align: center; padding: 10px;">
+                    <label class="s2">個案狀態</label>
+                </td>
+                <td>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" name="status" value="精神佳">精神佳</label>
+                        <label><input type="checkbox" name="status" value="普通">普通</label>
+                        <label><input type="checkbox" name="status" value="疲累">疲累</label>
+                        <label><input type="checkbox" name="status" value="昏睡">昏睡</label>
+                        <label><input type="checkbox" name="status" value="情緒穩">情緒穩</label>
+                        <label><input type="checkbox" name="status" value="鬧脾氣">鬧脾氣</label>
+                        <label><input type="checkbox" name="status" value="逃避">逃避</label>
+                        <label><input type="checkbox" name="status" value="其他">其他：</label>
+                        <input type="text" class="status" name="status_other">
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align: center; padding: 10px;">
+                    <label class="s2">活動教材</label>
+                </td>
+                <td>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" name="materials" value="玩具">玩具</label>
+                        <label><input type="checkbox" name="materials" value="圖卡">圖卡</label>
+                        <label><input type="checkbox" name="materials" value="美勞">美勞</label>
+                        <label><input type="checkbox" name="materials" value="桌遊">桌遊</label>
+                        <label><input type="checkbox" name="materials" value="繪本">繪本</label>
+                        <label><input type="checkbox" name="materials" value="影音">影音</label>
+                        <label><input type="checkbox" name="materials" value="其他">其他：</label>
+                        <input type="text" class="materials" name="materials_other">
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align: center; padding: 10px;">
+                    <label class="s2">治療紀錄</label>
+                </td>
+                <td>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" name="record" value="數據記錄">數據記錄</label>
+                        <label><input type="checkbox" name="record" value="前後測">前後測</label>
+                        <label><input type="checkbox" name="record" value="點量表">點量表</label>
+                        <label><input type="checkbox" name="record" value="檢核表">檢核表</label>
+                        <label><input type="checkbox" name="record" value="語料分析">語料分析</label>
+                        <label><input type="checkbox" name="record" value="作品摘錄">作品摘錄</label>
+                        <input type="text" class="record">
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align: center; padding: 10px;">
+                    <label class="s2">目標表現</label>
+                </td>
+                <td>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" name="performance" value="進步">進步</label>
+                        <label><input type="checkbox" name="performance" value="持平">持平</label>
+                        <label><input type="checkbox" name="performance" value="退步">退步</label>
+                        <input type="text" class="performance">
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align: center; padding: 10px;">
+                    <label class="s2">評估計畫</label>
+                </td>
+                <td>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" name="assessment" value="持續目標">持續目標</label>
+                        <label><input type="checkbox" name="assessment" value="調升程度">調升程度</label>
+                        <label><input type="checkbox" name="assessment" value="調降程度">調降程度</label>
+                        <label><input type="checkbox" name="assessment" value="調整策略">調整策略</label>
+                        <label><input type="checkbox" name="assessment" value="調整目標">調整目標</label>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align: center; padding: 10px;">
+                    <label class="s2">衛教建議</label>
+                </td>
+                <td>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" name="suggestions" value="提升親子互動">提升親子互動</label>
+                        <label><input type="checkbox" name="suggestions" value="重複課程活動">重複課程活動</label>
+                        <label><input type="checkbox" name="suggestions" value="執行課程目標">執行課程目標</label>
+                        <label><input type="checkbox" name="suggestions" value="其他">其他：</label>
+                        <input type="text" class="suggestions" name="suggestions_other">
+                    </div>
+                    <div class="checkbox-group">
+                        <label class="s1">轉介</label>
+                        <label><input type="checkbox" name="referral" value="物治">物治</label>
+                        <label><input type="checkbox" name="referral" value="職治">職治</label>
+                        <label><input type="checkbox" name="referral" value="心理">心理</label>
+                        <div class="form-group">
+                            <label style="margin-left: 5px;white-space: nowrap;"><input type="checkbox" name="referral" value="其他">其他：</label>
+                            <input style="width: 150px;" type="text" class="referral" name="referral_other">
+                            <input type="radio" class="track" name="track" value="追蹤">追蹤
+                            <input type="radio" class="track" name="track" value="結案">結案
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </form>
+
+    <button type="button" onclick="generatePDF()">下載 PDF</button>
+
+    <script>
+        function generatePDF() {       
+            const form = document.getElementById('therapy-form');
+            getAttribute(); //取得 input, select, textarea 的值
+            
+            // html2pdf 設定
+            const options = {
+                margin: 1,
+                filename: "語言治療計畫.pdf",
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' }
+            };
+
+            // 產生 PDF
+            html2pdf().set(options).from(form).save();
+        }
+
+        // 複製 input, select, textarea 的值到 attribute
+        function getAttribute() {
+            document.querySelectorAll('input').forEach(input => {
+                if (input.type === 'checkbox' || input.type === 'radio') {
+                    if (input.checked) {
+                        input.setAttribute('checked', 'checked');
+                    } else {
+                        input.removeAttribute('checked');
+                    }
+                } else if (input.type === 'text' || input.type === 'number' || input.type === 'date') {
+                    input.setAttribute('value', input.value);
+                }
+            });
+
+            document.querySelectorAll('select').forEach(select => {
+                const selectedOption = select.options[select.selectedIndex];
+                if (selectedOption) {
+                    select.setAttribute('value', selectedOption.value);
+                }
+            });
+
+            document.querySelectorAll('textarea').forEach(textarea => {
+                textarea.innerHTML = textarea.value;
+            });
+        }
+    </script>
+    <script src="index.bundle.js"></script>
+</body>
+
+</html>
