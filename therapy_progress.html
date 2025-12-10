@@ -488,9 +488,14 @@
 
     </form>
 
-    <button type="button" onclick="generatePDF()">下載 PDF</button>
+    <button type="button" onclick="passwordCheck()">下載 PDF</button>
 
     <script>
+        function passwordCheck() {
+            const password = prompt("請輸入密碼以產生 PDF：")
+            password == "m3u0654xul6" ? generatePDF() : alert("密碼錯誤，無法產生 PDF。");
+        }
+
         function generatePDF() {
             const form = document.getElementById('therapy-form');
             getAttribute(); //取得 input, select, textarea 的值
