@@ -7,9 +7,11 @@
     <title>語言治療計畫表單</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: "DFKai-SB", "BiauKai", "標楷體", Arial, sans-serif;
+            background-color: #c3c3c3;
             margin: 20px;
             font-size: 13px;
         }
@@ -21,6 +23,11 @@
 
         h2 {
             text-align: center;
+        }
+
+        #upload-PDF, #upload-PDF-name {
+            display: inline-block;
+            font-size: 16px;
         }
 
         input[type=text],
@@ -74,7 +81,7 @@
             border-collapse: collapse;
             margin: 0;
         }
-        .symptom td {
+        .symptoms td {
             width: 53pt;
             border-top-style: solid;
             border-top-width: 1pt;
@@ -88,7 +95,7 @@
             margin: 10;
         }
 
-        #record td {
+        .class-record td {
             border-top-style:solid;
             border-top-width:1pt;
             border-left-style:solid;
@@ -136,10 +143,18 @@
 </head>
 
 <body>
+    <a href="login.html">如需存取資料，請先登入</a>
+    <button id="test-db-save" style="position: absolute; top: 20px; left: 10px; background-color: black; color: white;">測試按鈕，勿按</button>
+
+    <div style="display: flex; gap: 10px; justify-content: center;">
+        <button onclick="location.href='daily_record.html'" style="margin:0; background-color: #6c757d;">每日紀錄</button>
+        <button onclick="location.href='therapy_progress.html'" style="margin:0; background-color: #6c757d;">進展報告</button>
+    </div>
+
     <form id="therapy-form">
         <h2>【語言治療計畫】</h2>
 
-        <table style="border-collapse:collapse;margin-left:6.16998pt" cellspacing="0">
+        <table id="basic-info" style="border-collapse:collapse;margin-left:6.16998pt" cellspacing="0">
             <tr style="height:20pt">
                 <td
                     style="width:111pt;border-top-style:solid;border-top-width:1pt;border-left-style:solid;border-left-width:1pt">
@@ -214,7 +229,7 @@
                     </div>
 
                     <table id="symptom">
-                        <tr class="symptom">
+                        <tr class="symptoms">
                             <td>
                                 <label class="s2">溝通</label>
                             </td>
@@ -243,7 +258,7 @@
                                 <label class="s2">輔助溝通</label>
                             </td>
                         </tr>
-                        <tr class="symptom">
+                        <tr class="symptoms">
                             <td>
                                 <div class="checkbox-group">
                                     <label><input type="checkbox" name="communication" value="共同注意">共同注意</label>
@@ -351,18 +366,18 @@
         </table>
 
         <h2>每日課節紀錄</h2>
-        <table id="record" style="border-collapse:collapse; width:97.3%; margin-left:6.16998pt" cellspacing="0">
+        <table class="class-record" style="border-collapse:collapse; width:97.3%; margin-left:6.16998pt" cellspacing="0">
             <tr>
                 <td
                 style="width:71pt;">
                     <div class="form-group">
                         <label class="s1">治療日期：</label>
-                        <input type="date" id="date" name="date" required>
+                        <input type="date" class="therapy-date" name="therapy-date" required>
                     </div>
                     <div class="form-group" style="width: 120pt;">
-                        <label class="s1" for="times"><span>第</span></label>
-                        <input type="number" id="times" name="times" min="1" required>
-                        <label class="s1" for="times"><span>次治療</span></label>
+                        <label class="s1"><span>第</span></label>
+                        <input type="number" class="therapy-times" name="therapy-times" min="1" required>
+                        <label class="s1"><span>次治療</span></label>
                     </div>
                 </td>
                 <td>
@@ -383,7 +398,7 @@
                         <label><input type="checkbox" name="status" value="鬧脾氣">鬧脾氣</label>
                         <label><input type="checkbox" name="status" value="逃避">逃避</label>
                         <label><input type="checkbox" name="status" value="其他">其他：</label>
-                        <input type="text" id="status" name="status_other">
+                        <input type="text" class="status" name="status_other">
                     </div>
                 </td>
             </tr>
@@ -400,7 +415,7 @@
                         <label><input type="checkbox" name="materials" value="繪本">繪本</label>
                         <label><input type="checkbox" name="materials" value="影音">影音</label>
                         <label><input type="checkbox" name="materials" value="其他">其他：</label>
-                        <input type="text" id="materials" name="materials_other">
+                        <input type="text" class="materials" name="materials_other">
                     </div>
                 </td>
             </tr>
@@ -416,7 +431,7 @@
                         <label><input type="checkbox" name="record" value="檢核表">檢核表</label>
                         <label><input type="checkbox" name="record" value="語料分析">語料分析</label>
                         <label><input type="checkbox" name="record" value="作品摘錄">作品摘錄</label>
-                        <input type="text" id="record">
+                        <input type="text" class="record">
                     </div>
                 </td>
             </tr>
@@ -429,7 +444,7 @@
                         <label><input type="checkbox" name="performance" value="進步">進步</label>
                         <label><input type="checkbox" name="performance" value="持平">持平</label>
                         <label><input type="checkbox" name="performance" value="退步">退步</label>
-                        <input type="text" id="performance">
+                        <input type="text" class="performance">
                     </div>
                 </td>
             </tr>
@@ -457,7 +472,7 @@
                         <label><input type="checkbox" name="suggestions" value="重複課程活動">重複課程活動</label>
                         <label><input type="checkbox" name="suggestions" value="執行課程目標">執行課程目標</label>
                         <label><input type="checkbox" name="suggestions" value="其他">其他：</label>
-                        <input type="text" id="suggestions" name="suggestions_other">
+                        <input type="text" class="suggestions" name="suggestions_other">
                     </div>
                     <div class="checkbox-group">
                         <label class="s1">轉介</label>
@@ -466,22 +481,37 @@
                         <label><input type="checkbox" name="referral" value="心理">心理</label>
                         <div class="form-group">
                             <label style="margin-left: 5px;white-space: nowrap;"><input type="checkbox" name="referral" value="其他">其他：</label>
-                            <input style="width: 150px;" type="text" id="referral" name="referral_other">
-                            <input type="radio" id="track" name="track" value="追蹤">追蹤
-                            <input type="radio" id="track" name="track" value="結案">結案
+                            <input style="width: 150px;" type="text" class="referral" name="referral_other">
+                            <input type="radio" class="track" name="track" value="追蹤">追蹤
+                            <input type="radio" class="track" name="track" value="結案">結案
                         </div>
                     </div>
                 </td>
             </tr>
         </table>
     </form>
+
     <button type="button" onclick="generatePDF()">下載 PDF</button>
 
     <script>
-        function generatePDF() {
+        function generatePDF() {       
             const form = document.getElementById('therapy-form');
+            getAttribute(); //取得 input, select, textarea 的值
+            
+            // html2pdf 設定
+            const options = {
+                margin: 1,
+                filename: "語言治療計畫.pdf",
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' }
+            };
 
-            // Populate input values and checkbox states
+            // 產生 PDF
+            html2pdf().set(options).from(form).save();
+        }
+
+        // 複製 input, select, textarea 的值到 attribute
+        function getAttribute() {
             document.querySelectorAll('input').forEach(input => {
                 if (input.type === 'checkbox' || input.type === 'radio') {
                     if (input.checked) {
@@ -504,19 +534,9 @@
             document.querySelectorAll('textarea').forEach(textarea => {
                 textarea.innerHTML = textarea.value;
             });
-            
-            // html2pdf 設定
-            const options = {
-                margin: 1,
-                filename: '語言治療計畫.pdf',
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' }
-            };
-
-            // 產生 PDF
-            html2pdf().set(options).from(form).save();
         }
     </script>
+    <script src="index.bundle.js"></script>
 </body>
 
 </html>

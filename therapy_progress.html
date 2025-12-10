@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>語言治療進展報告</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <style>
+        body {
+            font-family: "DFKai-SB", "BiauKai", "標楷體", Arial, sans-serif; /* 建議使用標楷體比較像公文/病歷 */
+            background-color: #c3c3c3;
+            margin: 20px;
+            font-size: 13px;
+        }
+
+        form {
+            max-width: 850px; /* 稍微加寬以容納複雜表格 */
+            margin: auto;
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        h4 {
+            margin: 10px 0 5px 0;
+            font-size: 15px;
+        }
+
+        /* 輸入框通用樣式 */
+        input[type=text],
+        input[type=number],
+        input[type=date],
+        select {
+            padding: 2px 5px;
+            margin: 0 2px;
+            font-size: 14px;
+            box-sizing: border-box;
+            border: none;
+            border-bottom: 1px solid black;
+            font-family: inherit;
+            background: transparent;
+        }
+        
+        /* 調整輸入框寬度 */
+        input.full-width { width: 98%; }
+        input.short { width: 50px; text-align: center; }
+        input.medium { width: 120px; }
+
+        select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background: none;
+        }
+        
+        input[type=date]::-webkit-calendar-picker-indicator {
+            display: none;
+        }
+
+        /* 基本資料表格樣式 */
+        table.basic-info {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+        }
+        table.basic-info td {
+            border: 1px solid black; /* 修正邊框顯示 */
+            padding: 5px;
+        }
+
+        /* 治療目標表格樣式 */
+        table.grid-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 5px;
+        }
+        table.grid-table thead th {
+            font-size: medium;
+        }
+        table.grid-table th, table.grid-table td {
+            border: 1px solid black;
+            padding: 4px;
+            vertical-align: top;
+            font-size: 12px;
+        }
+        table.grid-table th {
+            text-align: center;
+            background-color: #f9f9f9;
+            font-weight: bold;
+        }
+
+        /* Checkbox 排版 */
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .checkbox-group label {
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+        .checkbox-group input[type=checkbox] {
+            margin-right: 3px;
+        }
+
+        /* 列表式 checkbox (用於大表格內) */
+        .list-checkbox label {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 3px;
+        }
+        .list-checkbox input[type=checkbox] {
+            margin-top: 2px;
+            margin-right: 4px;
+        }
+
+        /* 區塊容器 */
+        .section-box {
+            border: 1px solid black;
+            padding: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .row-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .row-item .label {
+            font-weight: bold;
+            margin-right: 8px;
+            white-space: nowrap;
+        }
+
+        /* 按鈕樣式 */
+        button {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        
+        /* 隱藏列印時的按鈕 */
+        @media print {
+            button, a { display: none; }
+        }
+    </style>
+</head>
+
+<body>
+    <a href="login.html">如需存取資料，請先登入</a>
+    <button id="test-db-save" style="position: absolute; top: 20px; left: 10px; background-color: black; color: white;">測試按鈕，勿按</button>
+
+    <div style="display: flex; gap: 10px; justify-content: center;">
+        <button onclick="location.href='index.html'" style="margin:0; background-color: #6c757d;">語言治療計畫表單</button>
+        <button onclick="location.href='daily_record.html'" style="margin:0; background-color: #6c757d;">每日紀錄</button>
+    </div>
+
+    <form id="therapy-form">
+        <h2>語言治療進展報告</h2>
+
+        <table class="basic-info">
+            <tr>
+                <td style="width: 20%;">
+                    <span>姓名：</span>
+                    <input type="text" id="name" name="name" style="width: 60%;" required>
+                </td>
+                <td style="width: 20%;">
+                    <span>性別：</span>
+                    <label><input type="checkbox" name="gender" value="男">男</label>
+                    <label><input type="checkbox" name="gender" value="女">女</label>
+                </td>
+                <td style="width: 25%;">
+                    <span>出生日期：</span>
+                    <input type="date" id="birthDate" name="birthDate" required>
+                </td>
+                <td style="width: 35%;">
+                    <span>報告日期：</span>
+                    <input type="date" id="reportDate" name="reportDate" style="width: 60%;" required>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <span>醫療診斷：</span>
+                    <input type="text" id="diagnosis" name="diagnosis" style="width: 70%;" required>
+                </td>
+                <td>
+                    <span>實足年齡：</span>
+                    <br>
+                    <input type="number" id="year" name="year" class="short" min="0"> 歲
+                    <input type="number" id="month" name="month" class="short" max="11" min="0"> 月
+                </td>
+                <td>
+                    <span>治療師：</span>
+                    <input type="text" id="therapist" name="therapist" style="width: 70%;" required>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <span>語言/言語/吞嚥診斷：</span>
+                    <input type="text" id="linguisticDiagnosis" name="linguisticDiagnosis" style="width: 50%;">
+                </td>
+                <td colspan="2"> 
+                    <span>進展期間：</span>
+                    <input type="date" class="therapy-date" name="therapy-date">~
+                    <input type="date" class="therapy-date" name="therapy-date">
+                </td>
+            </tr>
+        </table>
+
+        <h4>1.主觀觀察：</h4>
+        <div style="margin-bottom: 5px;">
+            <span>個案/家屬主訴和期望：</span>
+            <input type="text" name="complaint" class="full-width">
+        </div>
+
+        <h4>2.目標與成效：</h4>
+        <table class="grid-table">
+            <thead>
+                <tr>
+                    <th colspan="2">短期目標</th>
+                    <th width="30%">
+                        成效評量 
+                        <label style="display:inline; margin-left:5px;"><input type="checkbox" name="eval_period" value="3個月">3個月</label>
+                        <label style="display:inline; margin-left:5px;"><input type="checkbox" name="eval_period" value="6個月">6個月</label>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td width="5%" style="text-align: center;">語言</td>
+                    <td width="65%">
+                        <div class="checkbox-group">
+                            <label><input type="checkbox" name="lang_goal" value="溝通">溝通</label>
+                            <label><input type="checkbox" name="lang_goal" value="理解">理解</label>
+                            <label><input type="checkbox" name="lang_goal" value="表達">表達</label>
+                            <label><input type="checkbox" name="lang_goal" value="閱讀">閱讀</label>
+                            <label><input type="checkbox" name="lang_goal" value="書寫">書寫</label>
+                            <label><input type="checkbox" name="lang_goal" value="語用">語用</label>
+                            <label><input type="checkbox" name="lang_goal" value="其他">其他</label>
+                        </div>
+                        <div class="goal-row">
+                            <span style="font-weight:bold;">起始能力：</span>
+                            <span class="hint-text">簡要說明一開始的能力</span>
+                            <input type="text" name="lang_start_ability" class="full-width">
+                        </div>
+                        <div class="goal-row">
+                            <span style="font-weight:bold;">治療內容：</span>
+                            <span class="hint-text">簡要說明治療方向內容</span>
+                            <input type="text" name="lang_content" class="full-width">
+                        </div>
+                    </td>
+                    <td>
+                        <div style="margin-bottom: 5px;">
+                            達成度(百分比) <input type="text" name="lang_percent" style="width:40px;">
+                        </div>
+                        <div style="margin-bottom: 5px;">
+                            日期 <input type="date" name="lang_date" style="width:110px;">
+                        </div>
+                        <div class="checkbox-group" style="justify-content: center; margin: 5px 0;">
+                            <label><input type="checkbox" name="lang_status" value="未">未</label>
+                            <label><input type="checkbox" name="lang_status" value="部分">部分</label>
+                            <label><input type="checkbox" name="lang_status" value="已">已</label>
+                        </div>
+                        <div>
+                            測驗(結果) <input type="text" name="lang_result" style="width:60px;">
+                        </div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td style="text-align: center;">言語</td>
+                    <td>
+                        <div class="checkbox-group">
+                            <label><input type="checkbox" name="speech_goal" value="發聲">發聲</label>
+                            <label><input type="checkbox" name="speech_goal" value="構音">構音</label>
+                            <label><input type="checkbox" name="speech_goal" value="音韻">音韻</label>
+                            <label><input type="checkbox" name="speech_goal" value="共鳴">共鳴</label>
+                            <label><input type="checkbox" name="speech_goal" value="嗓音">嗓音</label>
+                            <label><input type="checkbox" name="speech_goal" value="語暢">語暢</label>
+                            <label><input type="checkbox" name="speech_goal" value="其他">其他</label>
+                        </div>
+                        <div class="goal-row">
+                            <span style="font-weight:bold;">起始能力：</span>
+                            <input type="text" name="speech_start_ability" class="full-width">
+                        </div>
+                        <div class="goal-row">
+                            <span style="font-weight:bold;">治療內容：</span>
+                            <input type="text" name="speech_content" class="full-width">
+                        </div>
+                    </td>
+                    <td>
+                        <div style="margin-bottom: 5px;">
+                            達成度(百分比) <input type="text" name="speech_percent" style="width:40px;">
+                        </div>
+                        <div style="margin-bottom: 5px;">
+                            日期 <input type="date" name="speech_date" style="width:110px;">
+                        </div>
+                        <div class="checkbox-group" style="justify-content: center; margin: 5px 0;">
+                            <label><input type="checkbox" name="speech_status" value="未">未</label>
+                            <label><input type="checkbox" name="speech_status" value="部分">部分</label>
+                            <label><input type="checkbox" name="speech_status" value="已">已</label>
+                        </div>
+                        <div>
+                            測驗(結果) <input type="text" name="speech_result" style="width:60px;">
+                        </div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td style="text-align: center;">吞嚥</td>
+                    <td>
+                        <div class="checkbox-group">
+                            <label><input type="checkbox" name="swallow_goal" value="口腔感覺">口腔感覺</label>
+                            <label><input type="checkbox" name="swallow_goal" value="口腔動作">口腔動作</label>
+                            <label><input type="checkbox" name="swallow_goal" value="吞嚥反射">吞嚥反射</label>
+                            <label><input type="checkbox" name="swallow_goal" value="吞嚥功能">吞嚥功能</label>
+                            <label><input type="checkbox" name="swallow_goal" value="其他">其他</label>
+                        </div>
+                        <div class="goal-row">
+                            <span style="font-weight:bold;">起始能力：</span>
+                            <input type="text" name="swallow_start_ability" class="full-width">
+                        </div>
+                        <div class="goal-row">
+                            <span style="font-weight:bold;">治療內容：</span>
+                            <input type="text" name="swallow_content" class="full-width">
+                        </div>
+                    </td>
+                    <td>
+                        <div style="margin-bottom: 5px;">
+                            達成度(百分比) <input type="text" name="swallow_percent" style="width:40px;">
+                        </div>
+                        <div style="margin-bottom: 5px;">
+                            日期 <input type="date" name="swallow_date" style="width:110px;">
+                        </div>
+                        <div class="checkbox-group" style="justify-content: center; margin: 5px 0;">
+                            <label><input type="checkbox" name="swallow_status" value="未">未</label>
+                            <label><input type="checkbox" name="swallow_status" value="部分">部分</label>
+                            <label><input type="checkbox" name="swallow_status" value="已">已</label>
+                        </div>
+                        <div>
+                            檢查(結果) <input type="text" name="swallow_result" style="width:60px;">
+                        </div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td style="text-align: center;">溝通<br>輔助</td>
+                    <td>
+                        <div class="checkbox-group">
+                            <label><input type="checkbox" name="aac_goal" value="職能創建">職能創建</label>
+                            <label><input type="checkbox" name="aac_goal" value="AAC">AAC</label>
+                            <label><input type="checkbox" name="aac_goal" value="其他">其他</label>
+                        </div>
+                        <div class="goal-row">
+                            <span style="font-weight:bold;">起始能力：</span>
+                            <input type="text" name="aac_start_ability" class="full-width">
+                        </div>
+                        <div class="goal-row">
+                            <span style="font-weight:bold;">治療內容：</span>
+                            <input type="text" name="aac_content" class="full-width">
+                        </div>
+                    </td>
+                    <td>
+                        <div style="margin-bottom: 5px;">
+                            達成度(百分比) <input type="text" name="aac_percent" style="width:40px;">
+                        </div>
+                        <div style="margin-bottom: 5px;">
+                            日期 <input type="date" name="aac_date" style="width:110px;">
+                        </div>
+                        <div class="checkbox-group" style="justify-content: center; margin: 5px 0;">
+                            <label><input type="checkbox" name="aac_status" value="未">未</label>
+                            <label><input type="checkbox" name="aac_status" value="部分">部分</label>
+                            <label><input type="checkbox" name="aac_status" value="已">已</label>
+                        </div>
+                        <div>
+                            檢核(結果) <input type="text" name="aac_result" style="width:60px;">
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h4>3.進展與評估：</h4>
+        <div class="narrative-section">
+            <div class="narrative-row">
+                治療期間個案的療育態度：
+                <div class="checkbox-group" style="display:inline-flex;">
+                    <label><input type="checkbox" name="attitude" value="積極">積極</label>
+                    <label><input type="checkbox" name="attitude" value="配合">配合</label>
+                    <label><input type="checkbox" name="attitude" value="普通">普通</label>
+                    <label><input type="checkbox" name="attitude" value="被動">被動</label>
+                    <label><input type="checkbox" name="attitude" value="消極">消極</label>
+                    <label><input type="checkbox" name="attitude" value="拒絕">拒絕</label>
+                    <label><input type="checkbox" name="attitude" value="其他">其他</label>
+                    <input type="text" name="attitude_other" style="width:100px;">
+                </div>
+            </div>
+            
+            <div class="narrative-row">
+                個案在經過
+                <input type="number" name="duration_month" class="short"> 個月、
+                每周 <input type="number" name="freq_week" class="short"> 次、
+                總共 <input type="number" name="total_times" class="short"> 次的計畫治療介入後，各項能力評估如下：
+            </div>
+
+            <div class="narrative-row">
+                語言(<label style="display:inline;"><input type="checkbox" name="prog_lang" value="進步">進步</label>
+                <label style="display:inline;"><input type="checkbox" name="prog_lang" value="持平">持平</label>
+                <label style="display:inline;"><input type="checkbox" name="prog_lang" value="退步">退步</label>)、
+                言語(<label style="display:inline;"><input type="checkbox" name="prog_speech" value="進步">進步</label>
+                <label style="display:inline;"><input type="checkbox" name="prog_speech" value="持平">持平</label>
+                <label style="display:inline;"><input type="checkbox" name="prog_speech" value="退步">退步</label>)、
+                其他 <input type="text" name="prog_other_text" style="width:80px;">
+                (<label style="display:inline;"><input type="checkbox" name="prog_other" value="進步">進步</label>
+                <label style="display:inline;"><input type="checkbox" name="prog_other" value="持平">持平</label>
+                <label style="display:inline;"><input type="checkbox" name="prog_other" value="退步">退步</label>)
+            </div>
+
+            <div class="narrative-row">
+                治療期間使用 <input type="text" name="effective_prompt" style="width:100px;"> 提示、
+                <input type="text" name="effective_strategy" style="width:100px;"> 策略、
+                <input type="text" name="effective_level" style="width:80px;"> 程度協助有顯著成效
+            </div>
+
+            <div class="narrative-row">
+                個案提升 <span class="hint-text">說明治療期間進步能力</span>
+                <input type="text" name="improve_desc" class="full-width">
+            </div>
+
+            <div class="narrative-row">
+                治療期間使用 <input type="text" name="ineffective_prompt" style="width:100px;"> 提示、
+                <input type="text" name="ineffective_strategy" style="width:100px;"> 策略、
+                <input type="text" name="ineffective_level" style="width:80px;"> 程度協助無顯著成效
+            </div>
+
+            <div class="narrative-row">
+                個案 <span class="hint-text">說明治療期間持平或退步能力檢討可能因素</span>
+                <input type="text" name="stagnation_desc" class="full-width">
+            </div>
+        </div>
+
+        <h4>4.續療育計畫：</h4>
+        <div class="narrative-section">
+            <div class="narrative-row">
+                <span style="font-weight: bold;">臨床觀察：</span>
+                <span class="hint-text">說明治療期間臨床表現</span>
+                <input type="text" name="observation" class="full-width">
+            </div>
+            
+            <div class="narrative-row">
+                <span style="font-weight: bold;">家屬回饋：</span>
+                <span class="hint-text">說明居家練習在家表現</span>
+                <input type="text" name="feedback" class="full-width">
+            </div>
+
+            <div class="narrative-row checkbox-group">
+                <span style="font-weight: bold;">後續計畫：</span>
+                <label><input type="checkbox" name="plan_next" value="延續">延續</label>
+                <label><input type="checkbox" name="plan_next" value="轉換">轉換</label>
+                <span style="margin-left: 5px;">短期目標</span>
+            </div>
+
+            <div class="narrative-row checkbox-group">
+                <span>療育介入後個案能力進步，經治療師評估</span>
+                <label><input type="checkbox" name="discharge" value="轉為追蹤">轉為追蹤</label>
+                <label><input type="checkbox" name="discharge" value="可以結案">可以結案</label>
+                <span>。</span>
+            </div>
+        </div>
+
+    </form>
+
+    <button type="button" onclick="generatePDF()">下載 PDF</button>
+
+    <script>
+        function generatePDF() {
+            const form = document.getElementById('therapy-form');
+            getAttribute(); //取得 input, select, textarea 的值
+
+            // html2pdf 設定
+            const options = {
+                margin: [5, 5, 5, 5], 
+                filename: "語言治療進展報告.pdf",
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, logging: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            // 產生 PDF
+            html2pdf().set(options).from(form).save();
+        }
+
+        // 複製 input, select, textarea 的值到 attribute
+        function getAttribute() {
+            document.querySelectorAll('input').forEach(input => {
+                if (input.type === 'checkbox' || input.type === 'radio') {
+                    if (input.checked) {
+                        input.setAttribute('checked', 'checked');
+                    } else {
+                        input.removeAttribute('checked');
+                    }
+                } else if (input.type === 'text' || input.type === 'number' || input.type === 'date') {
+                    input.setAttribute('value', input.value);
+                }
+            });
+
+            document.querySelectorAll('select').forEach(select => {
+                const selectedOption = select.options[select.selectedIndex];
+                if (selectedOption) {
+                    select.querySelectorAll('option').forEach(opt => opt.removeAttribute('selected'));
+                    selectedOption.setAttribute('selected', 'selected');
+                }
+            });
+
+            document.querySelectorAll('textarea').forEach(textarea => {
+                textarea.innerHTML = textarea.value;
+            });
+        }
+    </script>
+</body>
+
+</html>
